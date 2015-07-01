@@ -1,6 +1,9 @@
-jQuery = require('jquery')
-require('bootstrap-less/bootstrap/bootstrap.less')
-require('../stylesheets/style.less');
-require('./events.coffee')
+require('../stylesheets/bootstrap.config.less');
 
-console.log('Application is loaded!');
+require('angular');
+require('angular-strap');
+require('angular-messages');
+require('angular-resource');
+require('angular-route');
+require('angular-cookies');
+require('./app');

@@ -18,19 +18,23 @@ var config = {
     },
     module: {
         loaders: [
-            // the url-loader uses DataUrls.
-            // the file-loader emits files.
-            { test: /\.woff$/,   loader: "url-loader?limit=10000&minetype=application/font-woff" },
-            { test: /\.woff2$/,   loader: "url-loader?limit=10000&minetype=application/font-woff" },
-            { test: /\.ttf$/,    loader: "file-loader" },
-            { test: /\.eot$/,    loader: "file-loader" },
-            { test: /\.svg$/,    loader: "file-loader" },
-            { test: /\.less$/, loader: 'style!css!less' },
-            { test: /\.coffee$/, loader: "coffee-loader" },
-            { test: /\.(coffee\.md|litcoffee)$/, loader: "coffee-loader?literate" }
+          // the url-loader uses DataUrls.
+          // the file-loader emits files.
+          { test: /\.woff$/,   loader: "url-loader?limit=10000&minetype=application/font-woff" },
+          { test: /\.woff2$/,   loader: "url-loader?limit=10000&minetype=application/font-woff" },
+          { test: /\.ttf$/,    loader: "file-loader" },
+          { test: /\.eot$/,    loader: "file-loader" },
+          { test: /\.svg$/,    loader: "file-loader" },
+          { test: /\.less$/, loader: 'style!css!less' },
+          { test: /\.coffee$/, loader: "coffee-loader" },
+          { test: /\.(coffee\.md|litcoffee)$/, loader: "coffee-loader?literate" }
         ]
     },
-    plugins: [new Webpack.HotModuleReplacementPlugin()]
+    plugins: [new Webpack.HotModuleReplacementPlugin()],
+    externals: {
+      'jquery': 'jQuery',
+      'jquery': '$'
+    }
 };
 
 module.exports = config;
