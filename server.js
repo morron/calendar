@@ -98,6 +98,22 @@ app.get('/api/calendars/:id', function (req, res, next) {
     });
 });
 
+app.post('/api/calendars', function(req, res, next) {
+    var calendar = new Calendar({
+        name: req.body.calendarName
+    });
+
+    calendar.save(function(err) {
+        if (err) {
+            if (err.code == 11000) {
+                return res.send(409, { message: calendar.name + ' already exists.' });
+            }
+            return next(err);
+        }
+        res.send(200);
+    });
+});
+
 app.use(function (err, req, res, next) {
     console.error(err.stack);
     res.send(500, {message: err.message});

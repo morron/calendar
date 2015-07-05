@@ -29,4 +29,4 @@ angular.module('MyApp', ['ngCookies', 'ngResource', 'ngMessages', 'ngRoute', 'mg
   }]);
 
 require('../services/calendar.js')
-require('../controllers/main.js');
+require('../controllers/controllers');

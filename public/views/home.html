@@ -1,14 +1,13 @@
 <div class="jumbotron">
   <div class="container">
-    <ul class="alphabet">
-
-    </ul>
-    <ul class="genres">
-
+    <ul class="list-unstyled">
+        <li ng-repeat="calendar in calendars">
+            <a href="/calendars/{{calendar._id}}">{{calendar.name}}</a>
+        </li>
     </ul>
   </div>
 </div>
 
 <div class="container">
-  
+
 </div>
