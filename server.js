@@ -5,6 +5,54 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var debug = require('debug')('calendar:server');
+var mongoose = require('mongoose');
+var bcrypt = require('bcryptjs');
+
+var calendarSchema = new mongoose.Schema({
+    name: String,
+    events: [{
+        type: mongoose.Schema.Types.ObjectId, ref: 'Event'
+    }],
+    owner: {
+        type: mongoose.Schema.Types.ObjectId, ref: 'User'
+    },
+});
+
+var eventSchema = new mongoose.Schema({
+    success: Boolean,
+    date: Date
+})
+
+var userSchema = new mongoose.Schema({
+    email: {type: String, unique: true},
+    password: String
+});
+
+userSchema.pre('save', function (next) {
+    var user = this;
+    if (!user.isModified('password')) return next();
+    bcrypt.genSalt(10, function (err, salt) {
+        if (err) return next(err);
+        bcrypt.hash(user.password, salt, function (err, hash) {
+            if (err) return next(err);
+            user.password = hash;
+            next();
+        });
+    });
+});
+
+userSchema.methods.comparePassword = function (candidatePassword, cb) {
+    bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
+        if (err) return cb(err);
+        cb(null, isMatch);
+    });
+};
+
+var User = mongoose.model('User', userSchema);
+var Calendar = mongoose.model('Calendar', calendarSchema);
+var Event = mongoose.model('Event', eventSchema);
+
+mongoose.connect('localhost');
 
 var app = express();
 
@@ -12,7 +60,7 @@ var app = express();
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(require('less-middleware')(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -26,6 +74,34 @@ var proxy = httpProxy.createProxyServer({
 var isProduction = process.env.NODE_ENV === 'production';
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
+
+//routes
+app.get('/api/calendars', function (req, res, next) {
+    var query = Calendar.find();
+    if (req.query.genre) {
+        query.where({genre: req.query.genre});
+    } else if (req.query.alphabet) {
+        query.where({name: new RegExp('^' + '[' + req.query.alphabet + ']', 'i')});
+    } else {
+        query.limit(12);
+    }
+    query.exec(function (err, shows) {
+        if (err) return next(err);
+        res.send(shows);
+    });
+});
+
+app.get('/api/calendars/:id', function (req, res, next) {
+    Show.findById(req.params.id, function (err, show) {
+        if (err) return next(err);
+        res.send(show);
+    });
+});
+
+app.use(function (err, req, res, next) {
+    console.error(err.stack);
+    res.send(500, {message: err.message});
+});
 
 if (!isProduction) {
 
@@ -43,7 +119,7 @@ if (!isProduction) {
     });
 
 
-    proxy.on('error', function(e) {
+    proxy.on('error', function (e) {
         // Just catch it
     });
 
@@ -67,6 +143,10 @@ if (!isProduction) {
     });
 
 }
+
+app.get('*', function (req, res) {
+    res.redirect('/#' + req.originalUrl);
+});
 
 server.on('listening', onListening);
 
