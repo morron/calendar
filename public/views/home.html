@@ -1,13 +1,24 @@
-<div class="jumbotron">
-  <div class="container">
-    <ul class="list-unstyled">
-        <li ng-repeat="calendar in calendars">
-            <a href="/calendars/{{calendar._id}}">{{calendar.name}}</a>
-        </li>
-    </ul>
-  </div>
-</div>
-
 <div class="container">
+    <div class="row">
+        <table class="table-striped table-condensed col-md-12">
+            <thead>
+                <th colspan="3">
 
+                </th>
+                <th ng-repeat="event in events">
+                    {{event | date: 'd'}}
+                </th>
+            </thead>
+            <tbody>
+                <tr ng-repeat="calendar in calendars">
+                    <td colspan="3">{{calendar.name}}</td>
+                    <td ng-repeat="event in events">
+                        <input type="checkbox" name="" ng-true-value="{{event}}" ng-false-value="{{undefined}}" ng-value="Date.parse('7/{{n}}/2015').getTime()" ng-model="calendar.events[$index]" ng-change="save(calendar)" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {{calendars|json}}
 </div>
+

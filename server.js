@@ -11,17 +11,12 @@ var bcrypt = require('bcryptjs');
 var calendarSchema = new mongoose.Schema({
     name: String,
     events: [{
-        type: mongoose.Schema.Types.ObjectId, ref: 'Event'
+        type: Date
     }],
     owner: {
         type: mongoose.Schema.Types.ObjectId, ref: 'User'
     },
 });
-
-var eventSchema = new mongoose.Schema({
-    success: Boolean,
-    date: Date
-})
 
 var userSchema = new mongoose.Schema({
     email: {type: String, unique: true},
@@ -50,7 +45,6 @@ userSchema.methods.comparePassword = function (candidatePassword, cb) {
 
 var User = mongoose.model('User', userSchema);
 var Calendar = mongoose.model('Calendar', calendarSchema);
-var Event = mongoose.model('Event', eventSchema);
 
 mongoose.connect('localhost');
 
@@ -92,9 +86,22 @@ app.get('/api/calendars', function (req, res, next) {
 });
 
 app.get('/api/calendars/:id', function (req, res, next) {
-    Show.findById(req.params.id, function (err, show) {
+    Calendar.findById(req.params.id, function (err, calendar) {
         if (err) return next(err);
-        res.send(show);
+        res.send(calendar);
+    });
+});
+
+app.put('/api/calendars/:id', function (req, res) {
+    Calendar.findById(req.params.id, function (err, calendar) {
+        if (err) return next(err);
+        calendar.events = req.body.events;
+        calendar.save(function(err) {
+            if (err) {
+                return next(err);
+            }
+            res.send(calendar);
+        });
     });
 });
 
